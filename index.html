@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#17243B">
+  <title>RTB BINGO</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23267455'/%3E%3Ctext x='32' y='34' text-anchor='middle' dominant-baseline='middle' fill='white' font-family='Arial,sans-serif' font-size='25' font-weight='900' letter-spacing='-1'%3ERTB%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17243B;
+      --paper: #FFF8E8;
+      --red: #B2382E;
+      --blue: #3857D6;
+      --green: #267455;
+      --gold: #946200;
+      --purple: #8050A3;
+      --mint: #B9E4CF;
+      --muted: #738096;
+      --rule: #D9D2C3;
+    }
+    * { box-sizing: border-box; }
+    ::selection { color: var(--ink); background: var(--mint); }
+    body {
+      margin: 0;
+      min-height: 100svh;
+      padding: max(24px, env(safe-area-inset-top)) 20px max(28px, env(safe-area-inset-bottom));
+      color: var(--paper);
+      background: var(--ink);
+      font-family: "Prompt", "Noto Sans Thai", sans-serif;
+    }
+    main { width: min(100%, 452px); margin: 0 auto; }
+    .intro { margin-bottom: 23px; }
+    .intro-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .intro-heading h1 { font-size: clamp(24px, 7vw, 36px); }
+    .intro-actions { display: flex; flex-shrink: 0; gap: 6px; }
+    .help-button svg { width: 21px; height: 21px; }
+    .help-button {
+      display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px;
+      padding: 0; border: 1px solid #c6cfdb; border-radius: 50%; background: transparent;
+      color: var(--paper); font: 500 23px/1 "Prompt", sans-serif; cursor: pointer;
+    }
+    .help-button:hover { color: var(--ink); background: var(--mint); border-color: var(--mint); }
+    .help-button:active { transform: scale(.95); }
+    body.rules-open { overflow: hidden; }
+    .rules-dialog {
+      width: min(440px, calc(100% - 32px)); max-height: calc(100svh - 48px);
+      padding: 24px; border: 0; border-radius: 16px;
+      color: var(--ink); background: var(--paper); font: 400 14px/1.75 "Prompt", sans-serif;
+      box-shadow: 0 18px 50px #080e1b66; overflow-y: auto;
+    }
+    .rules-dialog::backdrop { background: #080e1bbf; }
+    .rules-dialog h2 { margin: 0 0 20px; font-size: 23px; line-height: 1.4; }
+    .rules-dialog ol { margin: 0; padding-left: 23px; }
+    .rules-dialog li { padding-left: 4px; margin-bottom: 18px; }
+    .rules-dialog li::marker { color: var(--red); font-weight: 600; }
+    .rules-dialog strong { display: block; margin-bottom: 3px; font-weight: 600; }
+    .rules-close {
+      width: 100%; min-height: 44px; margin-top: 4px; padding: 10px 16px;
+      border: 0; border-radius: 7px; background: var(--ink); color: var(--paper);
+      font: 500 14px/1.5 "Prompt", sans-serif; cursor: pointer;
+    }
+    .rules-close:hover { background: var(--blue); }
+    h1 { margin: 0; font-size: clamp(28px, 8vw, 36px); line-height: 1.22; letter-spacing: -.04em; }
+    .intro p { margin: 7px 0 0; color: #c6cfdb; font-size: 14px; line-height: 1.65; }
+    .ticket {
+      container-type: inline-size;
+      position: relative; padding: 18px; overflow: hidden; color: var(--ink); background: var(--paper);
+      border: 1px solid #ffffff20; border-radius: 14px; box-shadow: 0 12px 28px #080e1b45;
+    }
+    .letters { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 11px; padding-bottom: 10px; border-bottom: 1px dashed var(--rule); text-align: center; }
+    .letters span { color: var(--red); font-size: clamp(40px, 17vw, 90px); font-size: 22cqw; line-height: 1; font-weight: 700; }
+    .letters span:nth-child(2) { color: var(--blue); }
+    .letters span:nth-child(3) { color: var(--green); }
+    .letters span:nth-child(4) { color: var(--gold); }
+    .letters span:nth-child(5) { color: var(--purple); }
+    .grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+    .cell {
+      display: grid; place-items: center; aspect-ratio: 1; min-width: 0; padding: 0;
+      border: 1px solid var(--rule); border-radius: 7px; color: var(--ink); background: #fffdf7;
+      font: 600 clamp(18px, 6vw, 23px)/1 "Prompt", sans-serif; cursor: pointer;
+      -webkit-tap-highlight-color: transparent; transition: background-color .14s, color .14s, transform .14s;
+    }
+    .cell:not(.free):active { transform: scale(.94); }
+    .cell:nth-child(5n + 1) { --column-color: var(--red); }
+    .cell:nth-child(5n + 2) { --column-color: var(--blue); }
+    .cell:nth-child(5n + 3) { --column-color: var(--green); }
+    .cell:nth-child(5n + 4) { --column-color: var(--gold); }
+    .cell:nth-child(5n + 5) { --column-color: var(--purple); }
+    .cell.marked { color: white; background: var(--column-color); border-color: var(--column-color); }
+    .cell.free { color: var(--ink); background: var(--mint); border-color: var(--mint); font-size: 12px; font-weight: 700; }
+    .free-art { display: grid; justify-items: center; gap: 1px; }
+    .free-art svg { display: block; width: clamp(30px, 9vw, 44px); height: auto; }
+    .free-art span { font-size: 10px; line-height: 1.2; }
+    .cell.winning { color: var(--ink); background: #F3C969; border-color: #B18A32; }
+    .cell.stamped { animation: stamp 180ms cubic-bezier(.16, 1, .3, 1); }
+    .confetti { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 10; }
+    .confetti i { position: absolute; top: -20px; width: 8px; height: 14px; border-radius: 2px; animation: fall var(--duration, 2600ms) linear both; }
+    .celebration-label {
+      position: absolute; top: 38%; left: 50%; width: min(310px, calc(100% - 48px));
+      padding: 22px 16px; border: 2px solid #F3C969; border-radius: 16px;
+      color: var(--paper); background: var(--ink); text-align: center;
+      box-shadow: 0 12px 40px #080e1b66;
+      transform: translate(-50%, -50%); animation: bingo-reveal 2200ms cubic-bezier(.16, 1, .3, 1) both;
+    }
+    .celebration-label strong { display: block; color: #F3C969; font-size: clamp(40px, 12vw, 60px); line-height: 1.15; }
+    .celebration-label span { display: block; margin-top: 8px; font-size: 14px; }
+    @keyframes bingo-reveal {
+      0% { transform: translate(-50%, -50%) scale(.8); opacity: 0; }
+      15%, 75% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(1.04); opacity: 0; }
+    }
+    @keyframes stamp { from { transform: scale(.88); } to { transform: scale(1); } }
+    @keyframes fall { to { transform: translate(var(--drift), 105vh) rotate(var(--turn)); opacity: 0; } }
+    .cell:focus-visible, button:focus-visible { outline: 3px solid #F3C969; outline-offset: 3px; }
+    .hint { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 16px 0 0; color: #d4dbe5; font-size: 13px; }
+    .hint b { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; color: var(--ink); background: var(--mint); font-size: 12px; }
+    .status { min-height: 34px; margin-top: 16px; text-align: center; color: #dbe4ee; font-size: 13px; }
+    .status.win { color: var(--mint); font-size: 17px; font-weight: 700; }
+    .foot { margin: 14px 0 0; padding-top: 13px; border-top: 1px solid #ffffff20; text-align: center; color: #bac4d2; font-size: 12px; }
+    @media (max-width: 360px) { body { padding-right: 14px; padding-left: 14px; } .ticket { padding: 14px; } .grid, .letters { gap: 6px; } .cell { border-radius: 6px; } }
+    @media (min-width: 700px) { body { padding-top: 42px; } main { width: 452px; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation: none !important; } }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="intro" aria-labelledby="title">
+      <div class="intro-heading">
+        <h1 id="title">พร้อมเล่นหรือยัง?</h1>
+        <div class="intro-actions">
+          <button class="help-button" id="clearButton" type="button" aria-label="ล้างเลขที่เลือก" title="ล้างเลขที่เลือก">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 3 7 7-11 11H6l-4-4L14 3Z"/><path d="m8 9 7 7M10 21h12"/></svg>
+          </button>
+          <button class="help-button" id="rulesButton" type="button" aria-label="ดูกติกาการเล่น" aria-haspopup="dialog" aria-controls="rulesDialog">?</button>
+        </div>
+      </div>
+      <p>ฟังเลขจากคนจับ แล้วแตะช่องบนกระดาน</p>
+    </section>
+    <section class="ticket" aria-label="กระดานบิงโกของคุณ">
+      <div class="letters" aria-hidden="true"><span>B</span><span>I</span><span>N</span><span>G</span><span>O</span></div>
+      <div class="grid" id="grid" role="group" aria-label="ตัวเลขบิงโก"></div>
+    </section>
+    <p class="hint"><b aria-hidden="true">✓</b> ช่องกลางฟรี แต้มไว้ให้แล้ว</p>
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+    <p class="foot">วันละ 1 ใบ · กลับมาเปิดวันนี้ยังได้ใบเดิม</p>
+  </main>
+  <dialog class="rules-dialog" id="rulesDialog" aria-labelledby="rulesTitle">
+    <h2 id="rulesTitle">กติกาการเล่น</h2>
+    <ol>
+      <li><strong>เปิดกระดานของคุณ</strong>เข้าเว็บเพื่อรับกระดานบิงโกแบบสุ่มคนละ 1 ใบ ใช้กระดานเดิมตลอดรอบการเล่น</li>
+      <li><strong>ฟังหมายเลขที่ประกาศ</strong>ผู้จัดกิจกรรมสุ่มและประกาศหมายเลขทีละหมายเลข</li>
+      <li><strong>แตะเลขให้ตรง</strong>หากมีเลขที่ประกาศบนกระดาน ให้แตะช่องนั้นเพื่อทำเครื่องหมาย หากแตะผิด ให้แตะซ้ำเพื่อยกเลิก ช่องดาวตรงกลางเป็นช่องฟรี นับให้แล้วตั้งแต่เริ่ม</li>
+      <li><strong>ครบแนวแล้วพูดว่า “บิงโก!”</strong>เมื่อทำเครื่องหมายครบ 5 ช่องในแนวนอน แนวตั้ง หรือแนวทแยง ให้พูดว่า “บิงโก!” และแจ้งผู้จัดกิจกรรมเพื่อตรวจสอบ</li>
+    </ol>
+    <form method="dialog"><button class="rules-close" type="submit" autofocus>ปิดกติกา</button></form>
+  </dialog>
+  <script>
+    (() => {
+      const rulesButton = document.getElementById('rulesButton');
+      const rulesDialog = document.getElementById('rulesDialog');
+      rulesButton.addEventListener('click', () => {
+        rulesDialog.showModal();
+        document.body.classList.add('rules-open');
+      });
+      rulesDialog.addEventListener('close', () => {
+        document.body.classList.remove('rules-open');
+        rulesButton.focus({preventScroll: true});
+      });
+      rulesDialog.addEventListener('click', event => {
+        if (event.target !== rulesDialog) return;
+        const rect = rulesDialog.getBoundingClientRect();
+        if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) rulesDialog.close();
+      });
+      const KEY = 'คืนนี้-bingo-card-v1';
+      const grid = document.getElementById('grid');
+      const status = document.getElementById('status');
+      const columns = [[1,15],[16,30],[31,45],[46,60],[61,75]];
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const freeArt = `<span class="free-art" aria-hidden="true"><svg viewBox="0 0 64 58" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m32 4 9 15 17 4-11 13 1 17-16-7-16 7 1-17L6 23l17-4L32 4Z" fill="#F3C969" stroke="#17243B" stroke-width="2.5" stroke-linejoin="round"/><path d="M24 29v3m16-3v3m-13 5c3 4 7 4 10 0" stroke="#17243B" stroke-width="2.5" stroke-linecap="round"/><path d="m3 9 3 3m52-3-3 3" stroke="#17243B" stroke-width="2" stroke-linecap="round"/></svg><span>ฟรี</span></span>`;
+      const lines = [];
+      for (let r = 0; r < 5; r++) lines.push(Array.from({length: 5}, (_, c) => r * 5 + c));
+      for (let c = 0; c < 5; c++) lines.push(Array.from({length: 5}, (_, r) => r * 5 + c));
+      lines.push([0,6,12,18,24], [4,8,12,16,20]);
+      let celebratedLines = 0;
+      let card;
+      let cardDate;
+      const thaiDate = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit'
+      });
+      function today() {
+        const parts = thaiDate.formatToParts(new Date());
+        return ['year', 'month', 'day'].map(type => parts.find(part => part.type === type).value).join('-');
+      }
+      function makeCard() {
+        const result = Array(25);
+        columns.forEach(([min, max], col) => {
+          const nums = Array.from({length: max - min + 1}, (_, i) => min + i);
+          for (let i = nums.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [nums[i], nums[j]] = [nums[j], nums[i]];
+          }
+          nums.slice(0, 5).forEach((n, row) => {
+            result[row * 5 + col] = {n, marked: false, free: col === 2 && row === 2};
+          });
+        });
+        result[12] = {n: 'ฟรี', marked: true, free: true};
+        return result;
+      }
+      function celebrate(lineCount) {
+        if (reducedMotion.matches || document.hidden) return;
+        document.querySelector('.confetti')?.remove();
+        const shower = document.createElement('div');
+        shower.className = 'confetti';
+        shower.setAttribute('aria-hidden', 'true');
+        const colors = ['#F3C969', '#B9E4CF', '#FFF8E8', '#E87863', '#8BA4FF', '#C8A4E8'];
+        for (let i = 0; i < 100; i++) {
+          const piece = document.createElement('i');
+          piece.style.left = Math.random() * 100 + '%';
+          piece.style.background = colors[i % colors.length];
+          piece.style.animationDelay = Math.random() * 750 + 'ms';
+          piece.style.width = 5 + Math.random() * 7 + 'px';
+          piece.style.height = 8 + Math.random() * 10 + 'px';
+          piece.style.borderRadius = i % 3 === 0 ? '50%' : '2px';
+          piece.style.setProperty('--duration', 2100 + Math.random() * 1000 + 'ms');
+          piece.style.setProperty('--drift', (Math.random() - .5) * 300 + 'px');
+          piece.style.setProperty('--turn', (Math.random() - .5) * 1440 + 'deg');
+          shower.append(piece);
+        }
+        const label = document.createElement('div');
+        label.className = 'celebration-label';
+        const heading = document.createElement('strong');
+        heading.textContent = 'BINGO!';
+        const detail = document.createElement('span');
+        detail.textContent = `ครบ ${lineCount} แนวแล้ว! แจ้งผู้จัดได้เลย`;
+        label.append(heading, detail);
+        shower.append(label);
+        document.body.append(shower);
+        window.setTimeout(() => shower.remove(), 4000);
+      }
+      function save() { localStorage.setItem(KEY, JSON.stringify({date: cardDate, card})); }
+      function loadDailyCard() {
+        const date = today();
+        let saved;
+        try { saved = JSON.parse(localStorage.getItem(KEY)); } catch (_) { saved = null; }
+        // Keep the existing card when upgrading to the daily-card format.
+        const existing = Array.isArray(saved) ? saved : saved?.date === date ? saved.card : null;
+        card = Array.isArray(existing) && existing.length === 25 ? existing : makeCard();
+        cardDate = date;
+        celebratedLines = 0;
+        document.querySelector('.confetti')?.remove();
+        grid.replaceChildren();
+        save(); draw();
+      }
+      function refreshDay() {
+        if (cardDate === today()) return false;
+        loadDailyCard();
+        return true;
+      }
+      function draw(changedIndex) {
+        const complete = lines.filter(line => line.every(i => card[i].marked));
+        const winning = new Set(complete.flat());
+        card.forEach((item, i) => {
+          let button = grid.children[i];
+          if (!button) {
+          button = document.createElement('button');
+          button.type = 'button';
+          if (item.free) button.innerHTML = freeArt;
+          else button.textContent = item.n;
+          button.addEventListener('click', () => {
+            if (refreshDay()) return;
+            if (item.free) return;
+            item.marked = !item.marked;
+            save(); draw(i);
+          });
+          grid.append(button);
+          }
+          button.className = 'cell' + (item.marked ? ' marked' : '') + (item.free ? ' free' : '') + (winning.has(i) ? ' winning' : '');
+          button.setAttribute('aria-label', item.free ? 'ช่องฟรี แต้มไว้แล้ว' : `เลข ${item.n}${item.marked ? ', เลือกแล้ว' : ''}${winning.has(i) ? ', อยู่ในแนวบิงโก' : ''}`);
+          button.setAttribute('aria-pressed', String(item.marked));
+          if (i === changedIndex && item.marked) {
+            void button.offsetWidth;
+            button.classList.add('stamped');
+          }
+        });
+        const won = complete.length > 0;
+        const almost = lines.some(line => line.filter(i => card[i].marked).length === 4);
+        status.textContent = won ? `บิงโก! ครบ ${complete.length} แนวแล้ว` : almost ? 'อีกช่องเดียวก็ครบแนวแล้ว!' : 'เลือกแล้ว ' + card.filter(x => x.marked && !x.free).length + ' ช่อง';
+        status.classList.toggle('win', won);
+        if (changedIndex !== undefined && complete.length > celebratedLines) celebrate(complete.length);
+        celebratedLines = Math.max(celebratedLines, complete.length);
+      }
+      loadDailyCard();
+      document.getElementById('clearButton').addEventListener('click', () => {
+        if (refreshDay() || !card.some(item => item.marked && !item.free)) return;
+        if (!window.confirm('ล้างเลขที่เลือกทั้งหมด? กระดานใบเดิมและช่องฟรีจะยังอยู่')) return;
+        if (refreshDay()) return;
+        card.forEach(item => { item.marked = item.free; });
+        celebratedLines = 0;
+        document.querySelector('.confetti')?.remove();
+        save(); draw();
+      });
+      window.addEventListener('focus', refreshDay);
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) refreshDay();
+      });
+      window.setInterval(() => {
+        if (!document.hidden) refreshDay();
+      }, 1000);
+      window.addEventListener('storage', event => {
+        if (event.key !== KEY || !event.newValue) return;
+        let saved;
+        try { saved = JSON.parse(event.newValue); } catch (_) { return; }
+        if (saved?.date !== today() || !Array.isArray(saved.card) || saved.card.length !== 25) return;
+        cardDate = saved.date;
+        card = saved.card;
+        if (!card.some(item => item.marked && !item.free)) celebratedLines = 0;
+        grid.replaceChildren();
+        draw();
+      });
+    })();
+  </script>
+</body>
+</html>
+
