@@ -3,327 +3,410 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#17243B">
+  <meta name="theme-color" content="#E8F1EB">
   <title>RTB BINGO</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23267455'/%3E%3Ctext x='32' y='34' text-anchor='middle' dominant-baseline='middle' fill='white' font-family='Arial,sans-serif' font-size='25' font-weight='900' letter-spacing='-1'%3ERTB%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      color-scheme: light;
-      --ink: #17243B;
-      --paper: #FFF8E8;
-      --red: #B2382E;
-      --blue: #3857D6;
-      --green: #267455;
-      --gold: #946200;
-      --purple: #8050A3;
-      --mint: #B9E4CF;
-      --muted: #738096;
-      --rule: #D9D2C3;
-    }
-    * { box-sizing: border-box; }
-    ::selection { color: var(--ink); background: var(--mint); }
-    body {
-      margin: 0;
-      min-height: 100svh;
-      padding: max(24px, env(safe-area-inset-top)) 20px max(28px, env(safe-area-inset-bottom));
-      color: var(--paper);
-      background: var(--ink);
-      font-family: "Prompt", "Noto Sans Thai", sans-serif;
-    }
-    main { width: min(100%, 452px); margin: 0 auto; }
-    .intro { margin-bottom: 23px; }
-    .intro-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .intro-heading h1 { font-size: clamp(24px, 7vw, 36px); }
-    .intro-actions { display: flex; flex-shrink: 0; gap: 6px; }
-    .help-button svg { width: 21px; height: 21px; }
-    .help-button {
-      display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px;
-      padding: 0; border: 1px solid #c6cfdb; border-radius: 50%; background: transparent;
-      color: var(--paper); font: 500 23px/1 "Prompt", sans-serif; cursor: pointer;
-    }
-    .help-button:hover { color: var(--ink); background: var(--mint); border-color: var(--mint); }
-    .help-button:active { transform: scale(.95); }
-    body.rules-open { overflow: hidden; }
-    .rules-dialog {
-      width: min(440px, calc(100% - 32px)); max-height: calc(100svh - 48px);
-      padding: 24px; border: 0; border-radius: 16px;
-      color: var(--ink); background: var(--paper); font: 400 14px/1.75 "Prompt", sans-serif;
-      box-shadow: 0 18px 50px #080e1b66; overflow-y: auto;
-    }
-    .rules-dialog::backdrop { background: #080e1bbf; }
-    .rules-dialog h2 { margin: 0 0 20px; font-size: 23px; line-height: 1.4; }
-    .rules-dialog ol { margin: 0; padding-left: 23px; }
-    .rules-dialog li { padding-left: 4px; margin-bottom: 18px; }
-    .rules-dialog li::marker { color: var(--red); font-weight: 600; }
-    .rules-dialog strong { display: block; margin-bottom: 3px; font-weight: 600; }
-    .rules-close {
-      width: 100%; min-height: 44px; margin-top: 4px; padding: 10px 16px;
-      border: 0; border-radius: 7px; background: var(--ink); color: var(--paper);
-      font: 500 14px/1.5 "Prompt", sans-serif; cursor: pointer;
-    }
-    .rules-close:hover { background: var(--blue); }
-    h1 { margin: 0; font-size: clamp(28px, 8vw, 36px); line-height: 1.22; letter-spacing: -.04em; }
-    .intro p { margin: 7px 0 0; color: #c6cfdb; font-size: 14px; line-height: 1.65; }
-    .ticket {
-      container-type: inline-size;
-      position: relative; padding: 18px; overflow: hidden; color: var(--ink); background: var(--paper);
-      border: 1px solid #ffffff20; border-radius: 14px; box-shadow: 0 12px 28px #080e1b45;
-    }
-    .letters { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 11px; padding-bottom: 10px; border-bottom: 1px dashed var(--rule); text-align: center; }
-    .letters span { color: var(--red); font-size: clamp(40px, 17vw, 90px); font-size: 22cqw; line-height: 1; font-weight: 700; }
-    .letters span:nth-child(2) { color: var(--blue); }
-    .letters span:nth-child(3) { color: var(--green); }
-    .letters span:nth-child(4) { color: var(--gold); }
-    .letters span:nth-child(5) { color: var(--purple); }
-    .grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
-    .cell {
-      display: grid; place-items: center; aspect-ratio: 1; min-width: 0; padding: 0;
-      border: 1px solid var(--rule); border-radius: 7px; color: var(--ink); background: #fffdf7;
-      font: 600 clamp(18px, 6vw, 23px)/1 "Prompt", sans-serif; cursor: pointer;
-      -webkit-tap-highlight-color: transparent; transition: background-color .14s, color .14s, transform .14s;
-    }
-    .cell:not(.free):active { transform: scale(.94); }
-    .cell:nth-child(5n + 1) { --column-color: var(--red); }
-    .cell:nth-child(5n + 2) { --column-color: var(--blue); }
-    .cell:nth-child(5n + 3) { --column-color: var(--green); }
-    .cell:nth-child(5n + 4) { --column-color: var(--gold); }
-    .cell:nth-child(5n + 5) { --column-color: var(--purple); }
-    .cell.marked { color: white; background: var(--column-color); border-color: var(--column-color); }
-    .cell.free { color: var(--ink); background: var(--mint); border-color: var(--mint); font-size: 12px; font-weight: 700; }
-    .free-art { display: grid; justify-items: center; gap: 1px; }
-    .free-art svg { display: block; width: clamp(30px, 9vw, 44px); height: auto; }
-    .free-art span { font-size: 10px; line-height: 1.2; }
-    .cell.winning { color: var(--ink); background: #F3C969; border-color: #B18A32; }
-    .cell.stamped { animation: stamp 180ms cubic-bezier(.16, 1, .3, 1); }
-    .confetti { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 10; }
-    .confetti i { position: absolute; top: -20px; width: 8px; height: 14px; border-radius: 2px; animation: fall var(--duration, 2600ms) linear both; }
-    .celebration-label {
-      position: absolute; top: 38%; left: 50%; width: min(310px, calc(100% - 48px));
-      padding: 22px 16px; border: 2px solid #F3C969; border-radius: 16px;
-      color: var(--paper); background: var(--ink); text-align: center;
-      box-shadow: 0 12px 40px #080e1b66;
-      transform: translate(-50%, -50%); animation: bingo-reveal 2200ms cubic-bezier(.16, 1, .3, 1) both;
-    }
-    .celebration-label strong { display: block; color: #F3C969; font-size: clamp(40px, 12vw, 60px); line-height: 1.15; }
-    .celebration-label span { display: block; margin-top: 8px; font-size: 14px; }
-    @keyframes bingo-reveal {
-      0% { transform: translate(-50%, -50%) scale(.8); opacity: 0; }
-      15%, 75% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-      100% { transform: translate(-50%, -50%) scale(1.04); opacity: 0; }
-    }
-    @keyframes stamp { from { transform: scale(.88); } to { transform: scale(1); } }
-    @keyframes fall { to { transform: translate(var(--drift), 105vh) rotate(var(--turn)); opacity: 0; } }
-    .cell:focus-visible, button:focus-visible { outline: 3px solid #F3C969; outline-offset: 3px; }
-    .hint { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 16px 0 0; color: #d4dbe5; font-size: 13px; }
-    .hint b { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; color: var(--ink); background: var(--mint); font-size: 12px; }
-    .status { min-height: 34px; margin-top: 16px; text-align: center; color: #dbe4ee; font-size: 13px; }
-    .status.win { color: var(--mint); font-size: 17px; font-weight: 700; }
-    .foot { margin: 14px 0 0; padding-top: 13px; border-top: 1px solid #ffffff20; text-align: center; color: #bac4d2; font-size: 12px; }
-    @media (max-width: 360px) { body { padding-right: 14px; padding-left: 14px; } .ticket { padding: 14px; } .grid, .letters { gap: 6px; } .cell { border-radius: 6px; } }
-    @media (min-width: 700px) { body { padding-top: 42px; } main { width: 452px; } }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation: none !important; } }
+:root{color-scheme:light;--table:#E8F1EB;--ink:#164B3B;--paper:#FFFEFA;--muted:#576E62;--line:#D6E1D9;--red:#B63F42;--blue:#365BC0;--green:#237454;--gold:#946200;--purple:#8050A3;--sun:#F2CD70;--mint:#D8EDDD;--body:'IBM Plex Sans Thai',Tahoma,sans-serif;--display:'Bricolage Grotesque','IBM Plex Sans Thai',sans-serif}
+*{box-sizing:border-box}::selection{background:var(--sun);color:var(--ink)}body{margin:0;min-height:100svh;padding:max(26px,env(safe-area-inset-top)) 20px max(30px,env(safe-area-inset-bottom));background:var(--table);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}button{font:inherit;touch-action:manipulation;-webkit-tap-highlight-color:transparent}button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--blue);outline-offset:4px}button:disabled{cursor:default;opacity:.4}main{width:min(100%,464px);margin:auto}.intro{margin:0 0 22px}.intro-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}h1{margin:0;font-size:clamp(23px,6.5vw,30px);font-weight:600;line-height:1.4;letter-spacing:-.035em}.intro p{margin:4px 0 0;color:var(--muted);font-size:14px;line-height:1.6}.intro-actions{display:flex;gap:4px;flex-shrink:0}.icon-button{display:grid;place-items:center;width:44px;height:44px;flex-shrink:0;padding:0;border:1px solid #B7CBBE;border-radius:50%;background:transparent;color:var(--ink);cursor:pointer;transition:background .15s,border-color .15s}.icon-button svg{width:20px;height:20px;stroke-width:1.7}.icon-button:hover:not(:disabled){background:var(--paper);border-color:var(--ink)}.icon-button:active:not(:disabled){background:var(--mint)}.help-glyph{font-family:var(--display);font-size:24px;font-weight:600}
+.ticket{position:relative;container-type:inline-size;background:var(--paper);border:1px solid #C3D3C7;border-radius:20px;box-shadow:0 12px 32px #164B3B0E;overflow:hidden}.ticket-main{padding:18px}.ticket-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:12px;line-height:1.5}.ticket-meta .card-date{display:flex;align-items:center;gap:6px}.ticket-meta svg{width:14px;height:14px;stroke-width:1.6}.size-tag{border:1px solid var(--line);padding:2px 8px;border-radius:5px;font-family:var(--display);font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}.letters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin:18px 0 14px;text-align:center}.letter{color:var(--column);min-width:0}.letter b{display:block;font-family:var(--display);font-size:clamp(44px,17vw,86px);font-size:20cqw;font-weight:800;line-height:.9;letter-spacing:-.04em}.letter small{display:block;margin-top:9px;font-family:var(--display);font-weight:600;font-size:11px;letter-spacing:.01em}.letter:nth-child(1){--column:var(--red)}.letter:nth-child(2){--column:var(--blue)}.letter:nth-child(3){--column:var(--green)}.letter:nth-child(4){--column:var(--gold)}.letter:nth-child(5){--column:var(--purple)}.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}.cell{position:relative;isolation:isolate;display:grid;place-items:center;aspect-ratio:1;min-width:0;padding:0;border:1px solid #D9E2D8;border-radius:10px;background:#F7F9F4;color:var(--ink);font-family:var(--display);font-size:clamp(21px,6vw,29px);font-weight:700;font-variant-numeric:tabular-nums;line-height:1;cursor:pointer;transition:background .15s,border-color .15s,color .15s}.cell::before{content:'';position:absolute;z-index:-1;inset:4px;border-radius:50%;background:var(--column);opacity:0;transform:scale(.8);transition:transform .18s cubic-bezier(.16,1,.3,1),opacity .15s}.cell:hover:not(:disabled):not(.free):not(.marked){background:#EAF0E7;border-color:#94B5A1}.cell:active:not(:disabled):not(.free){transform:scale(.95)}.cell.marked{color:white;border-color:transparent;background:#EDF2E9}.cell.marked::before{opacity:1;transform:scale(1)}.cell.last-tapped:not(.winning){border-color:var(--column)}.cell.free{cursor:default;color:var(--ink);background:var(--mint);border:1px solid #B9D4BD}.cell.free::before{display:none}.free-art{display:grid;justify-items:center;gap:1px}.free-art svg{display:block;width:clamp(28px,8vw,43px);height:auto}.free-art span{font:600 11px/1.2 var(--body)}.cell.winning{background:#FCF2D9;color:#574013;border-color:#DEBD69}.cell.winning::before{background:var(--sun)}.cell.stamped{animation:stamp .2s cubic-bezier(.16,1,.3,1)}@keyframes stamp{from{transform:scale(.88)}to{transform:scale(1)}}
+.ticket-stub{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px dashed #AEC5B4;padding:16px 18px;background:#F7F9F3;font-size:12px;color:var(--muted)}.ticket-stub::before,.ticket-stub::after{content:'';position:absolute;top:-7px;width:12px;height:12px;background:var(--table);border:1px solid #C3D3C7;border-radius:50%}.ticket-stub::before{left:-7px}.ticket-stub::after{right:-7px}.stub-note{display:flex;align-items:center;gap:6px}.stub-note svg{width:15px;height:15px;fill:var(--sun);stroke:var(--gold);stroke-width:1.5}.marked-count{color:var(--ink);white-space:nowrap}.marked-count b{font-family:var(--display);font-size:16px;font-weight:700}.progress-section{margin-top:19px;padding:0 2px}.progress-row{display:flex;align-items:center;justify-content:space-between;gap:10px}.status{font-size:14px;font-weight:500;line-height:1.6}.status.win{color:var(--green);font-weight:600}.progress-count{font:600 15px/1 var(--display);white-space:nowrap}.progress-track{display:flex;gap:5px;margin-top:10px}.progress-step{height:5px;flex:1;border-radius:3px;background:#C8D9CC;transition:background .15s}.progress-step.filled{background:var(--green)}.progress-track.complete .progress-step{background:var(--gold)}.progress-caption{margin:7px 0 0;font-size:12px;color:var(--muted)}.last-action{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;margin-top:14px;border-top:1px solid #C4D7C9;font-size:13px;color:var(--muted)}.last-action strong{color:var(--ink);font-weight:600}.undo-button{display:flex;align-items:center;gap:5px;min-height:44px;padding:8px 0 8px 8px;border:0;background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer}.undo-button svg{width:16px;height:16px;stroke-width:1.8}.undo-button:hover:not(:disabled){text-decoration:underline;text-underline-offset:4px}.foot{display:flex;justify-content:center;align-items:center;gap:5px;margin:17px 0 0;color:var(--muted);font-size:12px;text-align:center;line-height:1.6}.foot svg{width:13px;height:13px;flex-shrink:0;stroke-width:1.7}.storage-note{font-size:12px;color:var(--red);text-align:center}.board-scroll{overflow-x:auto;scrollbar-color:#89AD96 var(--table);scrollbar-width:thin}.scroll-hint{margin:10px 0 0;color:var(--muted);font-size:12px;text-align:center}
+body.dialog-open{overflow:hidden}.sheet{width:min(440px,calc(100% - 28px));max-height:calc(100svh - 48px);margin:auto;padding:26px;border:1px solid #BDCFBF;border-radius:22px;background:var(--paper);color:var(--ink);box-shadow:0 24px 70px #10332533;font:400 14px/1.75 var(--body);overflow-y:auto}.sheet::backdrop{background:#0D352B80}.sheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}.sheet-head h2{margin:0;font-size:24px;font-weight:600;letter-spacing:-.025em}.sheet ol{margin:0;padding-left:23px}.sheet li{padding-left:5px;margin-bottom:18px;color:var(--muted)}.sheet li::marker{color:var(--green);font-family:var(--display);font-weight:700}.sheet li strong{display:block;margin-bottom:3px;color:var(--ink);font-weight:600}.sheet p{color:var(--muted);margin:0 0 24px}.dialog-actions{display:flex;gap:10px;margin-top:24px}.dialog-actions button{flex:1;min-height:48px;padding:11px;border:1px solid var(--ink);border-radius:10px;font-size:14px;font-weight:500;cursor:pointer}.primary{background:var(--ink);color:var(--paper)}.primary:hover{background:#23634C}.secondary{background:transparent;color:var(--ink)}.secondary:hover{background:var(--table)}.sheet[open]{animation:sheet-enter .2s cubic-bezier(.16,1,.3,1)}@keyframes sheet-enter{from{transform:translateY(14px);opacity:.5}to{transform:translateY(0);opacity:1}}
+.confetti{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:10}.confetti i{position:absolute;top:-20px;width:8px;height:14px;border-radius:2px;animation:fall var(--duration,2600ms) linear both}.celebration-label{position:absolute;top:40%;left:50%;width:min(310px,calc(100% - 48px));padding:27px 18px;border:2px solid var(--sun);border-radius:20px;color:var(--paper);background:var(--ink);text-align:center;box-shadow:0 16px 45px #10332544;transform:translate(-50%,-50%);animation:bingo-reveal 2200ms cubic-bezier(.16,1,.3,1) both}.celebration-label strong{display:block;color:var(--sun);font:800 clamp(48px,14vw,68px)/1 var(--display);letter-spacing:-.04em}.celebration-label span{display:block;margin-top:12px;font-size:14px}@keyframes bingo-reveal{0%{transform:translate(-50%,-50%) scale(.8) rotate(-4deg);opacity:0}15%,75%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(-50%,-50%) scale(1.04);opacity:0}}@keyframes fall{to{transform:translate(var(--drift),105vh) rotate(var(--turn));opacity:0}}
+body.large-board main{width:min(100%,760px)}.large-board .ticket{min-width:548px}.large-board .grid{grid-template-columns:repeat(10,minmax(44px,1fr));gap:6px}.large-board .cell{font-size:clamp(17px,3vw,25px);border-radius:8px}.large-board .letters{gap:6px}.large-board .letter b{font-size:17cqw}.large-board .cell::before{inset:3px}
+@media(min-width:700px){body{padding-top:40px;padding-bottom:40px}.intro{margin-bottom:25px}.ticket-main{padding:22px}.ticket-stub{padding:17px 22px}.large-board .intro-heading h1{font-size:32px}}@media(max-width:360px){body{padding-left:13px;padding-right:13px}.ticket-main{padding:14px}.grid,.letters{gap:5px}.intro-heading{gap:5px}h1{font-size:22px}.intro-actions{gap:2px}.icon-button{width:42px;height:42px}.ticket-stub{padding:14px}.stub-note{font-size:11px}.cell{border-radius:8px}}@media(max-width:520px){.sheet{margin:auto auto 14px;max-height:calc(100svh - 28px);padding:23px}.sheet-head{margin-bottom:16px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+.cell:nth-child(5n + 1){--column:var(--red)}
+.cell:nth-child(5n + 2){--column:var(--blue)}
+.cell:nth-child(5n + 3){--column:var(--green)}
+.cell:nth-child(5n + 4){--column:var(--gold)}
+.cell:nth-child(5n + 5){--column:var(--purple)}
+
+[hidden]{display:none!important}.cell:disabled{opacity:1;cursor:default}.cell:disabled:not(.free){background:#F7F9F4;border-color:#D9E2D8;transform:none}.mode-tag{padding:2px 7px;border-radius:5px;background:#FAEAC1;color:#72500B;font-size:11px;white-space:nowrap}.mode-tag.locked{background:var(--mint);color:var(--ink)}.selection-panel{margin:18px 0 0}.selection-panel h2{margin:0;font-size:18px;font-weight:600;line-height:1.5}.selection-panel p{margin:4px 0 14px;color:var(--muted);font-size:13px;line-height:1.6}.select-actions{display:flex;gap:9px}.select-actions button{flex:1;min-height:48px;padding:10px 8px;border:1px solid var(--ink);border-radius:10px;font-size:14px;font-weight:500;cursor:pointer}.selection-panel .selection-error{color:var(--red);margin-top:10px}.ticket-meta{gap:6px}
+    .mode-tag{display:inline-flex;align-items:center;gap:4px}.mode-tag svg{width:12px;height:12px;flex-shrink:0}
   </style>
 </head>
 <body>
   <main>
-    <section class="intro" aria-labelledby="title">
+    <header class="intro">
       <div class="intro-heading">
-        <h1 id="title">พร้อมเล่นหรือยัง?</h1>
+        <h1>พร้อมเล่นหรือยัง?</h1>
         <div class="intro-actions">
-          <button class="help-button" id="clearButton" type="button" aria-label="ล้างเลขที่เลือก" title="ล้างเลขที่เลือก">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 3 7 7-11 11H6l-4-4L14 3Z"/><path d="m8 9 7 7M10 21h12"/></svg>
-          </button>
-          <button class="help-button" id="rulesButton" type="button" aria-label="ดูกติกาการเล่น" aria-haspopup="dialog" aria-controls="rulesDialog">?</button>
+          <button class="icon-button" id="clearButton" type="button" aria-label="ล้างเลขที่เลือก" title="ล้างเลขที่เลือก" aria-haspopup="dialog" aria-controls="clearDialog" disabled><svg  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 3 7 7-11 11H6l-4-4L14 3Z"/><path d="m8 9 7 7M10 21h12"/></svg></button>
+          <button class="icon-button" id="rulesButton" type="button" aria-label="ดูกติกาการเล่น" title="กติกาการเล่น" aria-haspopup="dialog" aria-controls="rulesDialog"><span class="help-glyph" aria-hidden="true">?</span></button>
         </div>
       </div>
       <p>ฟังเลขจากคนจับ แล้วแตะช่องบนกระดาน</p>
-    </section>
+    </header>
+    
     <section class="ticket" aria-label="กระดานบิงโกของคุณ">
-      <div class="letters" aria-hidden="true"><span>B</span><span>I</span><span>N</span><span>G</span><span>O</span></div>
-      <div class="grid" id="grid" role="group" aria-label="ตัวเลขบิงโก"></div>
+      <div class="ticket-main">
+        <div class="ticket-meta"><span class="card-date"><svg  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18"/></svg><time id="cardDate"></time></span><span class="mode-tag" id="cardState"><svg id="lockIcon" hidden viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span id="cardStateText">กำลังเลือกใบ</span></span><span class="size-tag">5 × 5</span></div>
+        <div class="letters" aria-hidden="true"><div class="letter"><b>B</b><small>1–15</small></div><div class="letter"><b>I</b><small>16–30</small></div><div class="letter"><b>N</b><small>31–45</small></div><div class="letter"><b>G</b><small>46–60</small></div><div class="letter"><b>O</b><small>61–75</small></div></div>
+        <div class="grid" id="grid" role="group" aria-label="ตัวเลขบิงโก"></div>
+      </div>
+      <div class="ticket-stub">
+        <span class="stub-note"><svg  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-6Z"/></svg>ช่องดาวนับให้แล้ว </span>
+        <span class="marked-count">เลือกแล้ว <b id="markedCount">0</b> / 24</span>
+      </div>
     </section>
-    <p class="hint"><b aria-hidden="true">✓</b> ช่องกลางฟรี แต้มไว้ให้แล้ว</p>
-    <div class="status" id="status" role="status" aria-live="polite"></div>
-    <p class="foot">วันละ 1 ใบ · กลับมาเปิดวันนี้ยังได้ใบเดิม</p>
+    
+    <section class="selection-panel" id="selectionPanel" aria-labelledby="selectionTitle">
+      <h2 id="selectionTitle">ถูกใจใบนี้ไหม?</h2>
+      <p>รีเฟรชหรือสุ่มดูใบอื่นได้ไม่จำกัด ก่อนยืนยันยังแตะเลขไม่ได้</p>
+      <div class="select-actions">
+        <button class="secondary" id="rerollButton" type="button">สุ่มดูใบอื่น</button>
+        <button class="primary" id="chooseButton" type="button" aria-haspopup="dialog" aria-controls="chooseDialog">ยืนยันใช้ใบนี้</button>
+      </div>
+    </section>
+    <section id="gameProgress" hidden class="progress-section" aria-label="ความคืบหน้าของแนวที่ใกล้บิงโกที่สุด">
+      <div class="progress-row"><div class="status" id="status" role="status" aria-live="polite"></div><span class="progress-count" id="progressCount" aria-hidden="true"></span></div>
+      <div class="progress-track" id="progressTrack" aria-hidden="true"><span class="progress-step"></span><span class="progress-step"></span><span class="progress-step"></span><span class="progress-step"></span><span class="progress-step"></span></div>
+      <p class="progress-caption" id="progressCaption"></p>
+    </section>
+    <div class="last-action" id="lastAction" hidden><span id="actionText" role="status" aria-live="polite">แตะเลขที่คนจับประกาศได้เลย</span><button class="undo-button" id="undoButton" type="button" disabled aria-label="ย้อนกลับการทำเครื่องหมายล่าสุด"><svg  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 5-5 5 5 5M3 10h10a7 7 0 0 1 7 7v2"/></svg>ย้อนกลับ</button></div>
+    <p class="foot"><svg  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span id="footText">ก่อนยืนยัน เลือกใบใหม่ได้ไม่จำกัด</span></p>
+    <p class="storage-note" id="storageNote" hidden>เบราว์เซอร์ไม่อนุญาตให้บันทึก กระดานอาจหายเมื่อปิดหน้าเว็บ</p>
   </main>
-  <dialog class="rules-dialog" id="rulesDialog" aria-labelledby="rulesTitle">
-    <h2 id="rulesTitle">กติกาการเล่น</h2>
+  <dialog class="sheet" id="rulesDialog" aria-labelledby="rulesTitle">
+    <div class="sheet-head"><h2 id="rulesTitle">กติกาการเล่น</h2><form method="dialog"><button class="icon-button" aria-label="ปิดกติกา" autofocus><svg  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></form></div>
     <ol>
-      <li><strong>เปิดกระดานของคุณ</strong>เข้าเว็บเพื่อรับกระดานบิงโกแบบสุ่มคนละ 1 ใบ ใช้กระดานเดิมตลอดรอบการเล่น</li>
-      <li><strong>ฟังหมายเลขที่ประกาศ</strong>ผู้จัดกิจกรรมสุ่มและประกาศหมายเลขทีละหมายเลข</li>
-      <li><strong>แตะเลขให้ตรง</strong>หากมีเลขที่ประกาศบนกระดาน ให้แตะช่องนั้นเพื่อทำเครื่องหมาย หากแตะผิด ให้แตะซ้ำเพื่อยกเลิก ช่องดาวตรงกลางเป็นช่องฟรี นับให้แล้วตั้งแต่เริ่ม</li>
-      <li><strong>ครบแนวแล้วพูดว่า “บิงโก!”</strong>เมื่อทำเครื่องหมายครบ 5 ช่องในแนวนอน แนวตั้ง หรือแนวทแยง ให้พูดว่า “บิงโก!” และแจ้งผู้จัดกิจกรรมเพื่อตรวจสอบ</li>
+      <li><strong>เลือกกระดานที่ถูกใจ</strong>รีเฟรชหน้าเว็บหรือกด “สุ่มดูใบอื่น” เพื่อรับกระดานใหม่ได้ไม่จำกัด ช่วงนี้ยังแตะเลขเพื่อทำเครื่องหมายไม่ได้</li>
+      <li><strong>ยืนยันก่อนเริ่มเล่น</strong>กด “ยืนยันใช้ใบนี้” แล้วกด “ยืนยันและล็อกใบ” ในกล่องยืนยันอีกครั้ง จึงจะเริ่มแตะเลขเพื่อทำเครื่องหมายได้ หากยังไม่แน่ใจให้กด “เลือกต่อ”</li>
+      <li><strong>ใบเดียวตลอดวัน</strong>เมื่อเห็นไอคอนแม่กุญแจพร้อมคำว่า “ล็อกใบแล้ว” หมายถึงยืนยันกระดานสำเร็จ วันนี้จะใช้ได้เฉพาะใบนี้ แม้รีเฟรชหรือเปิดใหม่ในเบราว์เซอร์เดิม ปุ่มล้างเลขและย้อนกลับไม่ปลดล็อกใบ เมื่อถึงเวลา 00:00 น. ของวันใหม่ตามเวลาประเทศไทย จึงเลือกและยืนยันใบใหม่ได้</li>
+      <li><strong>ฟังแล้วแตะเลขให้ตรง</strong>ผู้จัดกิจกรรมสุ่มประกาศเลขทีละหมายเลข หากมีเลขนั้นให้แตะช่องเพื่อทำเครื่องหมาย แตะซ้ำหรือกดย้อนกลับได้หากกดผิด ช่องดาวตรงกลางเป็นช่องฟรี นับให้แล้วตั้งแต่เริ่ม</li>
+      <li><strong>ครบแนวแล้วพูดว่า “บิงโก!”</strong>เมื่อครบ 5 ช่องในแนวนอน แนวตั้ง หรือแนวทแยง ให้พูดว่า “บิงโก!” และแจ้งผู้จัดกิจกรรมเพื่อตรวจสอบ ปุ่มล้างเลขจะล้างเฉพาะเครื่องหมาย ไม่เปลี่ยนกระดานที่ล็อกไว้</li>
     </ol>
-    <form method="dialog"><button class="rules-close" type="submit" autofocus>ปิดกติกา</button></form>
+    <form method="dialog" class="dialog-actions"><button class="primary">เข้าใจแล้ว ไปเล่นกัน</button></form>
+  </dialog>
+  <dialog class="sheet" id="clearDialog" aria-labelledby="clearTitle" aria-describedby="clearDescription">
+    <div class="sheet-head"><h2 id="clearTitle">ล้างเลขที่เลือก?</h2><form method="dialog"><button class="icon-button" aria-label="ปิดกล่องล้างเลข"><svg  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></form></div>
+    <p id="clearDescription">เครื่องหมายที่แตะไว้จะถูกล้าง ยังใช้กระดานใบเดิม และช่องดาวจะยังนับให้เหมือนเดิม</p>
+    <div class="dialog-actions"><form method="dialog" style="display:contents"><button class="secondary" autofocus>เก็บไว้ก่อน</button></form><button class="primary" id="confirmClear" type="button">ล้างเลขที่เลือก</button></div>
+  </dialog>
+  <dialog class="sheet" id="chooseDialog" aria-labelledby="chooseTitle" aria-describedby="chooseDescription">
+    <div class="sheet-head"><h2 id="chooseTitle">ยืนยันใช้ใบนี้?</h2></div>
+    <p id="chooseDescription">เมื่อยืนยันแล้ว จะเปลี่ยนกระดานไม่ได้จนจบวันนี้ตามเวลาประเทศไทย แม้รีเฟรชหรือปิดแล้วเปิดใหม่ก็จะได้ใบนี้</p>
+    <div class="dialog-actions"><form method="dialog" style="display:contents"><button class="secondary" autofocus>เลือกต่อ</button></form><button class="primary" id="confirmChoose" type="button">ยืนยันและล็อกใบ</button></div>
+    <p class="selection-error" id="chooseError" role="alert" hidden></p>
   </dialog>
   <script>
-    (() => {
-      const rulesButton = document.getElementById('rulesButton');
-      const rulesDialog = document.getElementById('rulesDialog');
-      rulesButton.addEventListener('click', () => {
-        rulesDialog.showModal();
-        document.body.classList.add('rules-open');
+(() => {
+  const SIZE = 5;
+  const TOTAL = SIZE * SIZE;
+  const KEY = 'lock';
+  const OLD_KEY = 'คืนนี้-bingo-card-v1';
+  const FREE = SIZE === 5 ? 12 : -1;
+  const grid = document.getElementById('grid');
+  const status = document.getElementById('status');
+  const clearButton = document.getElementById('clearButton');
+  const undoButton = document.getElementById('undoButton');
+  const actionText = document.getElementById('actionText');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const freeArt = `<span class="free-art" aria-hidden="true"><svg viewBox="0 0 64 58" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m32 4 9 15 17 4-11 13 1 17-16-7-16 7 1-17L6 23l17-4L32 4Z" fill="#F3C969" stroke="#17243B" stroke-width="2.5" stroke-linejoin="round"/><path d="M24 29v3m16-3v3m-13 5c3 4 7 4 10 0" stroke="#17243B" stroke-width="2.5" stroke-linecap="round"/><path d="m3 9 3 3m52-3-3 3" stroke="#17243B" stroke-width="2" stroke-linecap="round"/></svg><span>ฟรี</span></span>`;
+  const history = [];
+  const lines = [];
+  for (let r = 0; r < SIZE; r++) lines.push(Array.from({length: SIZE}, (_, c) => r * SIZE + c));
+  for (let c = 0; c < SIZE; c++) lines.push(Array.from({length: SIZE}, (_, r) => r * SIZE + c));
+  lines.push(Array.from({length: SIZE}, (_, i) => i * SIZE + i), Array.from({length: SIZE}, (_, i) => i * SIZE + SIZE - 1 - i));
+  let card, cardDate, confirmed = false, celebratedLines = 0;
+  const dateFormatter = new Intl.DateTimeFormat('en-CA', {timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit'});
+  function today() {
+    const parts = dateFormatter.formatToParts(new Date());
+    return ['year', 'month', 'day'].map(type => parts.find(part => part.type === type).value).join('-');
+  }
+  function shuffle(nums) {
+    for (let i = nums.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [nums[i], nums[j]] = [nums[j], nums[i]];
+    }
+    return nums;
+  }
+  function makeCard() {
+    if (SIZE === 10) return shuffle(Array.from({length: TOTAL}, (_, i) => i + 1)).map(n => ({n, marked: false}));
+    const result = Array(TOTAL);
+    for (let c = 0; c < SIZE; c++) {
+      shuffle(Array.from({length: 15}, (_, i) => c * 15 + i + 1)).slice(0, SIZE).forEach((n, r) => {
+        result[r * SIZE + c] = {n, marked: false, free: false};
       });
-      rulesDialog.addEventListener('close', () => {
-        document.body.classList.remove('rules-open');
-        rulesButton.focus({preventScroll: true});
-      });
-      rulesDialog.addEventListener('click', event => {
-        if (event.target !== rulesDialog) return;
-        const rect = rulesDialog.getBoundingClientRect();
-        if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) rulesDialog.close();
-      });
-      const KEY = 'คืนนี้-bingo-card-v1';
-      const grid = document.getElementById('grid');
-      const status = document.getElementById('status');
-      const columns = [[1,15],[16,30],[31,45],[46,60],[61,75]];
-      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-      const freeArt = `<span class="free-art" aria-hidden="true"><svg viewBox="0 0 64 58" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m32 4 9 15 17 4-11 13 1 17-16-7-16 7 1-17L6 23l17-4L32 4Z" fill="#F3C969" stroke="#17243B" stroke-width="2.5" stroke-linejoin="round"/><path d="M24 29v3m16-3v3m-13 5c3 4 7 4 10 0" stroke="#17243B" stroke-width="2.5" stroke-linecap="round"/><path d="m3 9 3 3m52-3-3 3" stroke="#17243B" stroke-width="2" stroke-linecap="round"/></svg><span>ฟรี</span></span>`;
-      const lines = [];
-      for (let r = 0; r < 5; r++) lines.push(Array.from({length: 5}, (_, c) => r * 5 + c));
-      for (let c = 0; c < 5; c++) lines.push(Array.from({length: 5}, (_, r) => r * 5 + c));
-      lines.push([0,6,12,18,24], [4,8,12,16,20]);
-      let celebratedLines = 0;
-      let card;
-      let cardDate;
-      const thaiDate = new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit'
-      });
-      function today() {
-        const parts = thaiDate.formatToParts(new Date());
-        return ['year', 'month', 'day'].map(type => parts.find(part => part.type === type).value).join('-');
-      }
-      function makeCard() {
-        const result = Array(25);
-        columns.forEach(([min, max], col) => {
-          const nums = Array.from({length: max - min + 1}, (_, i) => min + i);
-          for (let i = nums.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [nums[i], nums[j]] = [nums[j], nums[i]];
-          }
-          nums.slice(0, 5).forEach((n, row) => {
-            result[row * 5 + col] = {n, marked: false, free: col === 2 && row === 2};
-          });
+    }
+    result[FREE] = {n: 'ฟรี', marked: true, free: true};
+    return result;
+  }
+  function validCard(value) {
+    if (!Array.isArray(value) || value.length !== TOTAL) return false;
+    const numbers = new Set();
+    return value.every((item, i) => {
+      if (!item || typeof item.marked !== 'boolean') return false;
+      if (i === FREE) return item.free === true && item.marked === true;
+      if (!Number.isInteger(item.n) || numbers.has(item.n) || item.free) return false;
+      numbers.add(item.n);
+      return SIZE === 10 ? item.n >= 1 && item.n <= 100 : item.n >= (i % SIZE) * 15 + 1 && item.n <= (i % SIZE + 1) * 15;
+    });
+  }
+  function save() {
+    if (!confirmed) return false;
+    try {
+      localStorage.setItem(KEY, JSON.stringify({date: cardDate, card, confirmed: true}));
+      document.getElementById('storageNote').hidden = true;
+      return true;
+    } catch (_) {
+      document.getElementById('storageNote').hidden = false;
+      return false;
+    }
+  }
+  function resetHistory() {
+    history.length = 0;
+    actionText.textContent = 'แตะเลขที่คนจับประกาศได้เลย';
+  }
+  function migrateStorage() {
+    try {
+      const previous = localStorage.getItem(OLD_KEY);
+      if (previous === null) return;
+      const current = localStorage.getItem(KEY);
+      let oldRecord, newRecord;
+      try { oldRecord = JSON.parse(previous); } catch (_) {}
+      try { newRecord = JSON.parse(current); } catch (_) {}
+      const valid = record => validCard(Array.isArray(record) ? record : record?.card);
+      const usePrevious = valid(oldRecord) && (!valid(newRecord) ||
+        (oldRecord.date === today() && newRecord?.date !== today()));
+      if (usePrevious) localStorage.setItem(KEY, previous);
+      // Only remove the old name after copying successfully or keeping a valid newer record.
+      if (usePrevious || valid(newRecord) || !valid(oldRecord)) localStorage.removeItem(OLD_KEY);
+    } catch (_) {
+      document.getElementById('storageNote').hidden = false;
+    }
+  }
+  function readConfirmed(date) {
+    let saved;
+    try { saved = JSON.parse(localStorage.getItem(KEY)); } catch (_) { return null; }
+    if (!saved || (saved.date !== date && !Array.isArray(saved))) return null;
+    const value = Array.isArray(saved) ? saved : saved.card;
+    if (!validCard(value)) return null;
+    if (saved.confirmed === true) return {date, card: value};
+    // Preserve cards already played before confirmation was introduced.
+    if (saved.confirmed === undefined && value.some((item, i) => item.marked && i !== FREE)) {
+      return {date, card: value, legacy: true};
+    }
+    return null;
+  }
+  function loadDailyCard() {
+    const date = today();
+    const saved = readConfirmed(date);
+    confirmed = !!saved;
+    card = saved ? saved.card : makeCard();
+    cardDate = date;
+    celebratedLines = 0;
+    resetHistory();
+    document.querySelector('.confetti')?.remove();
+    grid.replaceChildren();
+    const dateNode = document.getElementById('cardDate');
+    dateNode.dateTime = date;
+    dateNode.textContent = new Intl.DateTimeFormat('th-TH', {timeZone: 'Asia/Bangkok', day: 'numeric', month: 'short', year: 'numeric'}).format(new Date(date + 'T12:00:00+07:00'));
+    if (saved?.legacy) save();
+    draw();
+  }
+  function refreshDay() {
+    if (cardDate === today() && (confirmed || !readConfirmed(cardDate))) return false;
+    for (const dialog of document.querySelectorAll('dialog[open]')) dialog.close();
+    loadDailyCard();
+    return true;
+  }
+  function addHistory(action) {
+    history.push(action);
+    if (history.length > 100) history.shift();
+  }
+  function draw(changedIndex) {
+    const complete = lines.filter(line => line.every(i => card[i].marked));
+    const winning = new Set(complete.flat());
+    card.forEach((item, i) => {
+      let button = grid.children[i];
+      if (!button) {
+        button = document.createElement('button');
+        button.type = 'button';
+        if (i === FREE) button.innerHTML = freeArt;
+        else button.textContent = item.n;
+        button.addEventListener('click', () => {
+          if (refreshDay() || !confirmed || i === FREE) return;
+          addHistory({kind: 'cell', index: i, before: card[i].marked});
+          card[i].marked = !card[i].marked;
+          actionText.textContent = (card[i].marked ? 'แต้มเลข ' : 'ยกเลิกเลข ') + card[i].n + ' แล้ว';
+          save(); draw(i);
         });
-        result[12] = {n: 'ฟรี', marked: true, free: true};
-        return result;
+        grid.append(button);
       }
-      function celebrate(lineCount) {
-        if (reducedMotion.matches || document.hidden) return;
-        document.querySelector('.confetti')?.remove();
-        const shower = document.createElement('div');
-        shower.className = 'confetti';
-        shower.setAttribute('aria-hidden', 'true');
-        const colors = ['#F3C969', '#B9E4CF', '#FFF8E8', '#E87863', '#8BA4FF', '#C8A4E8'];
-        for (let i = 0; i < 100; i++) {
-          const piece = document.createElement('i');
-          piece.style.left = Math.random() * 100 + '%';
-          piece.style.background = colors[i % colors.length];
-          piece.style.animationDelay = Math.random() * 750 + 'ms';
-          piece.style.width = 5 + Math.random() * 7 + 'px';
-          piece.style.height = 8 + Math.random() * 10 + 'px';
-          piece.style.borderRadius = i % 3 === 0 ? '50%' : '2px';
-          piece.style.setProperty('--duration', 2100 + Math.random() * 1000 + 'ms');
-          piece.style.setProperty('--drift', (Math.random() - .5) * 300 + 'px');
-          piece.style.setProperty('--turn', (Math.random() - .5) * 1440 + 'deg');
-          shower.append(piece);
-        }
-        const label = document.createElement('div');
-        label.className = 'celebration-label';
-        const heading = document.createElement('strong');
-        heading.textContent = 'BINGO!';
-        const detail = document.createElement('span');
-        detail.textContent = `ครบ ${lineCount} แนวแล้ว! แจ้งผู้จัดได้เลย`;
-        label.append(heading, detail);
-        shower.append(label);
-        document.body.append(shower);
-        window.setTimeout(() => shower.remove(), 4000);
+      button.className = 'cell' + (item.marked ? ' marked' : '') + (i === FREE ? ' free' : '') + (winning.has(i) ? ' winning' : '') + (i === changedIndex ? ' last-tapped' : '');
+      button.setAttribute('aria-label', i === FREE ? 'ช่องฟรี แต้มไว้แล้ว' : 'เลข ' + item.n + (item.marked ? ', เลือกแล้ว' : '') + (winning.has(i) ? ', อยู่ในแนวบิงโก' : ''));
+      button.setAttribute('aria-pressed', String(item.marked));
+      button.disabled = !confirmed;
+      if (i === FREE) button.setAttribute('aria-disabled', 'true');
+      if (i === changedIndex && item.marked) {
+        void button.offsetWidth;
+        button.classList.add('stamped');
       }
-      function save() { localStorage.setItem(KEY, JSON.stringify({date: cardDate, card})); }
-      function loadDailyCard() {
-        const date = today();
-        let saved;
-        try { saved = JSON.parse(localStorage.getItem(KEY)); } catch (_) { saved = null; }
-        // Keep the existing card when upgrading to the daily-card format.
-        const existing = Array.isArray(saved) ? saved : saved?.date === date ? saved.card : null;
-        card = Array.isArray(existing) && existing.length === 25 ? existing : makeCard();
-        cardDate = date;
-        celebratedLines = 0;
-        document.querySelector('.confetti')?.remove();
-        grid.replaceChildren();
-        save(); draw();
-      }
-      function refreshDay() {
-        if (cardDate === today()) return false;
-        loadDailyCard();
-        return true;
-      }
-      function draw(changedIndex) {
-        const complete = lines.filter(line => line.every(i => card[i].marked));
-        const winning = new Set(complete.flat());
-        card.forEach((item, i) => {
-          let button = grid.children[i];
-          if (!button) {
-          button = document.createElement('button');
-          button.type = 'button';
-          if (item.free) button.innerHTML = freeArt;
-          else button.textContent = item.n;
-          button.addEventListener('click', () => {
-            if (refreshDay()) return;
-            if (item.free) return;
-            item.marked = !item.marked;
-            save(); draw(i);
-          });
-          grid.append(button);
-          }
-          button.className = 'cell' + (item.marked ? ' marked' : '') + (item.free ? ' free' : '') + (winning.has(i) ? ' winning' : '');
-          button.setAttribute('aria-label', item.free ? 'ช่องฟรี แต้มไว้แล้ว' : `เลข ${item.n}${item.marked ? ', เลือกแล้ว' : ''}${winning.has(i) ? ', อยู่ในแนวบิงโก' : ''}`);
-          button.setAttribute('aria-pressed', String(item.marked));
-          if (i === changedIndex && item.marked) {
-            void button.offsetWidth;
-            button.classList.add('stamped');
-          }
-        });
-        const won = complete.length > 0;
-        const almost = lines.some(line => line.filter(i => card[i].marked).length === 4);
-        status.textContent = won ? `บิงโก! ครบ ${complete.length} แนวแล้ว` : almost ? 'อีกช่องเดียวก็ครบแนวแล้ว!' : 'เลือกแล้ว ' + card.filter(x => x.marked && !x.free).length + ' ช่อง';
-        status.classList.toggle('win', won);
-        if (changedIndex !== undefined && complete.length > celebratedLines) celebrate(complete.length);
-        celebratedLines = Math.max(celebratedLines, complete.length);
-      }
-      loadDailyCard();
-      document.getElementById('clearButton').addEventListener('click', () => {
-        if (refreshDay() || !card.some(item => item.marked && !item.free)) return;
-        if (!window.confirm('ล้างเลขที่เลือกทั้งหมด? กระดานใบเดิมและช่องฟรีจะยังอยู่')) return;
-        if (refreshDay()) return;
-        card.forEach(item => { item.marked = item.free; });
-        celebratedLines = 0;
-        document.querySelector('.confetti')?.remove();
-        save(); draw();
-      });
-      window.addEventListener('focus', refreshDay);
-      document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) refreshDay();
-      });
-      window.setInterval(() => {
-        if (!document.hidden) refreshDay();
-      }, 1000);
-      window.addEventListener('storage', event => {
-        if (event.key !== KEY || !event.newValue) return;
-        let saved;
-        try { saved = JSON.parse(event.newValue); } catch (_) { return; }
-        if (saved?.date !== today() || !Array.isArray(saved.card) || saved.card.length !== 25) return;
-        cardDate = saved.date;
-        card = saved.card;
-        if (!card.some(item => item.marked && !item.free)) celebratedLines = 0;
-        grid.replaceChildren();
+    });
+    const best = Math.max(...lines.map(line => line.filter(i => card[i].marked).length));
+    const won = complete.length > 0;
+    const marked = card.filter((item, i) => item.marked && i !== FREE).length;
+    status.textContent = won ? 'บิงโก! ครบ ' + complete.length + ' แนวแล้ว' : best === SIZE - 1 ? 'อีกช่องเดียว บิงโกเลย!' : 'อีก ' + (SIZE - best) + ' ช่องถึงบิงโก';
+    status.classList.toggle('win', won);
+    document.getElementById('markedCount').textContent = marked;
+    document.getElementById('progressCount').textContent = best + ' / ' + SIZE;
+    const track = document.getElementById('progressTrack');
+    track.classList.toggle('complete', won);
+    Array.from(track.children).forEach((step, i) => step.classList.toggle('filled', i < best));
+    document.getElementById('progressCaption').textContent = won ? 'แจ้งผู้จัดกิจกรรมเพื่อตรวจสอบได้เลย' : 'นับจากแนวที่ใกล้ครบที่สุด' + (SIZE === 5 ? ' รวมช่องฟรีแล้ว' : '');
+    clearButton.disabled = !confirmed || marked === 0;
+    undoButton.disabled = !confirmed || history.length === 0;
+    document.getElementById('selectionPanel').hidden = confirmed;
+    document.getElementById('gameProgress').hidden = !confirmed;
+    document.getElementById('lastAction').hidden = !confirmed;
+    const state = document.getElementById('cardState');
+    document.getElementById('cardStateText').textContent = confirmed ? 'ล็อกใบแล้ว' : 'กำลังเลือกใบ';
+    document.getElementById('lockIcon').hidden = !confirmed;
+    state.classList.toggle('locked', confirmed);
+    document.getElementById('footText').textContent = confirmed ? 'ล็อกใบของวันนี้แล้ว เปิดกลับมายังได้ใบเดิม' : 'ก่อนยืนยัน เลือกใบใหม่ได้ไม่จำกัด';
+    if (changedIndex !== undefined && complete.length > celebratedLines) celebrate(complete.length);
+    celebratedLines = Math.max(celebratedLines, complete.length);
+  }
+  function celebrate(lineCount) {
+    if (reducedMotion.matches || document.hidden) return;
+    document.querySelector('.confetti')?.remove();
+    const shower = document.createElement('div');
+    shower.className = 'confetti';
+    shower.setAttribute('aria-hidden', 'true');
+    const colors = ['#F2CD70', '#A9D7B4', '#FFFEFA', '#D97879', '#8BA4FF', '#C8A4E8'];
+    for (let i = 0; i < 100; i++) {
+      const piece = document.createElement('i');
+      piece.style.left = Math.random() * 100 + '%';
+      piece.style.background = colors[i % colors.length];
+      piece.style.animationDelay = Math.random() * 750 + 'ms';
+      piece.style.width = 5 + Math.random() * 7 + 'px';
+      piece.style.height = 8 + Math.random() * 10 + 'px';
+      piece.style.borderRadius = i % 3 === 0 ? '50%' : '2px';
+      piece.style.setProperty('--duration', 2100 + Math.random() * 1000 + 'ms');
+      piece.style.setProperty('--drift', (Math.random() - .5) * 300 + 'px');
+      piece.style.setProperty('--turn', (Math.random() - .5) * 1440 + 'deg');
+      shower.append(piece);
+    }
+    const label = document.createElement('div');
+    label.className = 'celebration-label';
+    const heading = document.createElement('strong');
+    heading.textContent = 'BINGO!';
+    const detail = document.createElement('span');
+    detail.textContent = 'ครบ ' + lineCount + ' แนวแล้ว! แจ้งผู้จัดได้เลย';
+    label.append(heading, detail);
+    shower.append(label);
+    document.body.append(shower);
+    window.setTimeout(() => shower.remove(), 4000);
+  }
+  function openDialog(id) {
+    document.getElementById(id).showModal();
+    document.body.classList.add('dialog-open');
+  }
+  for (const dialog of document.querySelectorAll('dialog')) {
+    dialog.addEventListener('close', () => {
+      if (!document.querySelector('dialog[open]')) document.body.classList.remove('dialog-open');
+    });
+    dialog.addEventListener('click', event => {
+      if (event.target !== dialog) return;
+      const rect = dialog.getBoundingClientRect();
+      if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
+    });
+  }
+  document.getElementById('rulesButton').addEventListener('click', () => openDialog('rulesDialog'));
+  clearButton.addEventListener('click', () => {
+    if (refreshDay() || !confirmed || !card.some((item, i) => item.marked && i !== FREE)) return;
+    openDialog('clearDialog');
+  });
+  document.getElementById('confirmClear').addEventListener('click', () => {
+    document.getElementById('clearDialog').close();
+    if (refreshDay() || !confirmed) return;
+    addHistory({kind: 'clear', before: card.map(item => item.marked)});
+    card.forEach((item, i) => { item.marked = i === FREE; });
+    celebratedLines = 0;
+    document.querySelector('.confetti')?.remove();
+    actionText.textContent = 'ล้างเลขแล้ว ยังใช้กระดานใบเดิม';
+    save(); draw();
+  });
+  undoButton.addEventListener('click', () => {
+    if (refreshDay() || !confirmed) return;
+    const action = history.pop();
+    if (!action) return;
+    if (action.kind === 'clear') card.forEach((item, i) => { item.marked = action.before[i]; });
+    else card[action.index].marked = action.before;
+    actionText.textContent = action.kind === 'clear' ? 'คืนเลขที่เลือกไว้แล้ว' : 'ย้อนการแตะเลข ' + card[action.index].n + ' แล้ว';
+    document.querySelector('.confetti')?.remove();
+    save(); draw();
+  });
+  document.getElementById('rerollButton').addEventListener('click', () => {
+    if (refreshDay() || confirmed) return;
+    loadDailyCard();
+  });
+  document.getElementById('chooseButton').addEventListener('click', () => {
+    if (refreshDay() || confirmed) return;
+    document.getElementById('chooseError').hidden = true;
+    openDialog('chooseDialog');
+  });
+  document.getElementById('confirmChoose').addEventListener('click', async () => {
+    const button = document.getElementById('confirmChoose');
+    const candidate = card;
+    const candidateDate = cardDate;
+    button.disabled = true;
+    const commit = () => {
+      if (refreshDay() || confirmed || card !== candidate || cardDate !== candidateDate) return;
+      const saved = readConfirmed(today());
+      if (saved) { loadDailyCard(); document.getElementById('chooseDialog').close(); return; }
+      confirmed = true;
+      if (!save()) {
+        confirmed = false;
+        const error = document.getElementById('chooseError');
+        error.textContent = 'บันทึกการยืนยันไม่ได้ กรุณาอนุญาตให้เบราว์เซอร์บันทึกข้อมูล แล้วลองอีกครั้ง';
+        error.hidden = false;
         draw();
-      });
-    })();
-  </script>
+        return;
+      }
+      document.getElementById('chooseDialog').close();
+      resetHistory();
+      actionText.textContent = 'ล็อกใบนี้แล้ว เริ่มแตะเลขได้เลย';
+      draw();
+    };
+    try {
+      if (window.navigator?.locks?.request) await window.navigator.locks.request(KEY + '-confirm', commit);
+      else commit();
+    } catch (_) {
+      const error = document.getElementById('chooseError');
+      error.textContent = 'ยังยืนยันใบไม่ได้ กรุณาลองอีกครั้ง';
+      error.hidden = false;
+    } finally {
+      button.disabled = false;
+    }
+  });
+  window.addEventListener('focus', refreshDay);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshDay(); });
+  window.setInterval(() => { if (!document.hidden) refreshDay(); }, 1000);
+  window.addEventListener('storage', event => {
+    if (event.key !== KEY || !event.newValue) return;
+    let saved;
+    try { saved = JSON.parse(event.newValue); } catch (_) { return; }
+    if (saved?.date !== today() || saved.confirmed !== true || !validCard(saved.card)) return;
+    if (!confirmed) {
+      for (const dialog of document.querySelectorAll('dialog[open]')) dialog.close();
+    }
+    confirmed = true;
+    cardDate = saved.date;
+    card = saved.card;
+    resetHistory();
+    if (!card.some((item, i) => item.marked && i !== FREE)) celebratedLines = 0;
+    grid.replaceChildren();
+    draw();
+  });
+  migrateStorage();
+  loadDailyCard();
+})();
+</script>
 </body>
 </html>
-
